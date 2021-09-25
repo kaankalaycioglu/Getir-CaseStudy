@@ -1,29 +1,22 @@
-import config from './config/config.json';
+import dotenv from 'dotenv';
 import express from 'express';
 import { MongoClient } from 'mongodb';
 import handleError from './handle-error.js';
 
+dotenv.config();
+
 const main = async () => {
-    let client = new MongoClient(config.mongoUrl);
+    let client = new MongoClient(process.env.MONGO_URI);
+    let collection;
     try {
-        MongoClient.connect(config.mongoUrl, (err, client) => {
-            const db = client.db('getir-case-study');
-            db.collection('records').findOne({
-                createdAt: {
-                    $lte: new Date('2015-06-03')
-                }
-            }, (findErr, result) => {
-                if (findErr) throw findErr;
-            })
-        });
+        client = await client.connect();
+        const db = client.db(process.env.DB_NAME);
+        collection = db.collection(process.env.COLLECTION_NAME);
+    
     }
     catch (err) {
         console.error(err);
     }
-    client = await client.connect();
-    const db = client.db('getir-case-study');
-    const collection = db.collection('records');
-
     const app = express();
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json({ }));
