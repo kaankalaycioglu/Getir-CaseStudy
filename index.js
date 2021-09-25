@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import { MongoClient } from 'mongodb';
-import handleError from './handle-error.js';
+import handleError from './middlewares/handle-error.js';
 
 dotenv.config();
 
