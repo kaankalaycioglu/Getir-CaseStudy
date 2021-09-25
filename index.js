@@ -38,14 +38,12 @@ const main = async () => {
         });
     
     app.post('/', async (req, res, next) => {
-        console.log(req.body);
         const filter = {
             createdAt: {
                 $gte: new Date(req.body.startDate).toISOString(),
                 $lte: new Date(req.body.endDate).toISOString()
             }
         };
-        console.log(filter);
         const pipeline = [
             {
                 $match: {
@@ -84,8 +82,8 @@ const main = async () => {
         }
         res.json(response);
     });
-    
-    app.listen(3000, () => {
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
         console.log('Server running');
     });
 };
