@@ -4,9 +4,9 @@
   "description": "Getir Case Study",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --experimental-json-modules index.js",
+    "dev": "nodemon --experimental-json-modules server.js",
     "test": "jest",
-    "start": "node --experimental-json-modules index.js"
+    "start": "node --experimental-json-modules server.js"
   },
   "type": "module",
   "author": "",
