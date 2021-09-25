@@ -83,4 +83,3 @@ app.use('*', (req, res, next) => {
 app.use(handleError);
 
 export default app;
-module.exports = app;

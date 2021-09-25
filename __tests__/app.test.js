@@ -1,5 +1,5 @@
-const request = require('supertest');
-const app = require('../app');
+import request from 'supertest';
+import app from '../app.js';
 
 describe('POST / ', () => {
     it('should respond with an array of records, status code and message', async () => {
