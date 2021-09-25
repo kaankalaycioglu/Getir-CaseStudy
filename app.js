@@ -1,6 +1,12 @@
 import express from 'express';
+
+// middlewares
 import handleError from './middlewares/handle-error.js';
+
+// helpers
 import findRecords from './helpers/find-records.js';
+import checkPayload from './helpers/check-payload.js';
+
 // start defining express app
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -19,7 +25,9 @@ app.get('/', (req, res, next) => {
 // main endpoint that handles http post requests
 app.post('/', async (req, res, next) => {
     try {
-
+        if(!checkPayload(req.body)) {
+            throw new Error('Missing fields in request payload');
+        }
         // define filters for aggregate operation using the request body
         const filter = [
             {
