@@ -1,23 +1,6 @@
-import dotenv from 'dotenv';
 import express from 'express';
-import { MongoClient } from 'mongodb';
 import handleError from './middlewares/handle-error.js';
-
-dotenv.config();
-
-// establish mongodb connection
-let client = new MongoClient(process.env.MONGO_URI);
-let collection;
-try {
-    client = await client.connect();
-    const db = client.db('getir-case-study');
-    collection = db.collection('records');
-
-}
-catch (err) {
-    console.error(err);
-}
-
+import findRecords from './helpers/find-records.js';
 // start defining express app
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -72,11 +55,11 @@ app.post('/', async (req, res, next) => {
         ];
 
         // get results from mongodb collection and store in an array
-        const aggCursor = collection.aggregate(pipeline);
-        let records = [];
-        for await (const doc of aggCursor) {
-            records.push(doc);
+        const records = await findRecords(pipeline);
+        if (records instanceof Error) {
+            throw records;
         }
+
         // create response according to the specifications and send it
         const response = {
             code: 0,
@@ -100,3 +83,4 @@ app.use('*', (req, res, next) => {
 app.use(handleError);
 
 export default app;
+module.exports = app;
