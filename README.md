@@ -6,7 +6,7 @@
 * Then create a .env file with the following variable: MONGO_URI=Actual mongodb connection string provided in the case study document
 * Finally, in the root directory, run the command `npm start`
 
-# Test
+# Testing the application
 
-* In the root directory, run the command `npm test`
+* In the root directory, run the command `npm test` after successfully running the application
 
