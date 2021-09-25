@@ -12,8 +12,8 @@ const main = async () => {
     let collection;
     try {
         client = await client.connect();
-        const db = client.db(process.env.DB_NAME);
-        collection = db.collection(process.env.COLLECTION_NAME);
+        const db = client.db('getir-case-study');
+        collection = db.collection('records');
     
     }
     catch (err) {
