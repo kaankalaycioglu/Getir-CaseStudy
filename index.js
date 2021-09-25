@@ -19,7 +19,6 @@ const main = async () => {
                 }
             }, (findErr, result) => {
                 if (findErr) throw findErr;
-                console.log(result);
             })
         });
     }
@@ -35,7 +34,7 @@ const main = async () => {
     app.use(express.json({ }));
     
     app.get('/', (req, res, next) => {
-        res.json(['Yaren']);
+        res.send('Hello There');
         });
     
     app.post('/', async (req, res, next) => {
