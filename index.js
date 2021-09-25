@@ -1,13 +1,8 @@
 import config from './config/config.json';
 import express from 'express';
 import { MongoClient } from 'mongodb';
-//import Record from './record.model.js';
-const findRecords = async (collection, pipeline) => {
-    const aggCursor = coll.aggregate(pipeline);
-    for await (const doc of aggCursor) {
-        console.log(doc);
-    }
-};
+import handleError from './handle-error.js';
+
 const main = async () => {
     let client = new MongoClient(config.mongoUrl);
     try {
@@ -34,54 +29,71 @@ const main = async () => {
     app.use(express.json({ }));
     
     app.get('/', (req, res, next) => {
-        res.send('Hello There');
-        });
+        try {
+            res.send('Hello There');
+        }
+        catch (err) {
+            next(err);
+        }
+    });
     
     app.post('/', async (req, res, next) => {
-        const filter = {
-            createdAt: {
-                $gte: new Date(req.body.startDate).toISOString(),
-                $lte: new Date(req.body.endDate).toISOString()
-            }
-        };
-        const pipeline = [
-            {
-                $match: {
-                    createdAt: {
-                        $gte: new Date(req.body.startDate),
-                        $lte: new Date(req.body.endDate)
+        try {
+            const filter = {
+                createdAt: {
+                    $gte: new Date(req.body.startDate).toISOString(),
+                    $lte: new Date(req.body.endDate).toISOString()
+                }
+            };
+            const pipeline = [
+                {
+                    $match: {
+                        createdAt: {
+                            $gte: new Date(req.body.startDate),
+                            $lte: new Date(req.body.endDate)
+                        }
+                    },
+                },
+                {
+                    $project: {
+                        _id: false,
+                        key: true,
+                        createdAt: true,
+                        totalCount: { $sum: '$counts'}
                     }
                 },
-            },
-            {
-                $project: {
-                    _id: false,
-                    key: true,
-                    createdAt: true,
-                    totalCount: { $sum: '$counts'}
-                }
-            },
-            {
-                $match: {
-                    totalCount: {
-                        $gte: req.body.minCount,
-                        $lte: req.body.maxCount
+                {
+                    $match: {
+                        totalCount: {
+                            $gte: req.body.minCount,
+                            $lte: req.body.maxCount
+                        }
                     }
                 }
+            ]
+            const aggCursor = collection.aggregate(pipeline);
+            let records = [];
+            for await (const doc of aggCursor) {
+                records.push(doc);
             }
-        ]
-        const aggCursor = collection.aggregate(pipeline);
-        let records = [];
-        for await (const doc of aggCursor) {
-            records.push(doc);
+            const response = {
+                code: 0,
+                msg: 'Success',
+                records
+            }
+            res.json(response);
         }
-        const response = {
-            code: 0,
-            msg: 'Success',
-            records
+        catch (err) {
+            next(err);
         }
-        res.json(response);
+        
     });
+    app.use('*', (req, res, next) => {
+        const error = new Error('Not Found!');
+        error.code = 404;
+        next(error);
+    });
+    app.use(handleError);
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
         console.log('Server running');
